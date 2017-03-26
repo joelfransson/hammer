@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -19,7 +18,8 @@ func addUser(c *gin.Context) {
 
 	age, err := strconv.ParseInt(a, 10, 64)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	insertUser(n, age)
@@ -28,7 +28,11 @@ func addUser(c *gin.Context) {
 }
 
 func getUsers(c *gin.Context) {
-	res := getAllUsers()
+	res, err := getAllUsers()
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	data := make([]apiUser, len(res))
 	for i := range data {
@@ -39,7 +43,11 @@ func getUsers(c *gin.Context) {
 }
 
 func getUser(c *gin.Context) {
-	res := getUserByID(c.Param("id"))
+	res, err := getUserByID(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	u := apiUser{res.Name, res.Age}
 
