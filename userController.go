@@ -15,11 +15,11 @@ type apiUser struct {
 }
 
 type userController struct {
-	repo UserRepository
+	repo Users
 }
 
-func NewUserController() *userController {
-	return &userController{}
+func NewUserController(repo Users) *userController {
+	return &userController{repo}
 }
 
 func (uc *userController) addUser(c *gin.Context) {

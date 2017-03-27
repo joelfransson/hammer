@@ -22,7 +22,8 @@ func main() {
 	router.Use(mapMongo)
 	router.Use(errorHandler)
 
-	uc := NewUserController()
+	ur := NewUserRepository()
+	uc := NewUserController(ur)
 
 	router.GET("/users", uc.getUsers)
 	router.GET("/users/:id", uc.getUser)

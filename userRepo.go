@@ -13,7 +13,17 @@ type user struct {
 	Age  int64
 }
 
+type Users interface {
+	insertUser(db *mgo.Database, name string, age int64) error
+	getAllUsers(db *mgo.Database) ([]user, error)
+	getUserByID(db *mgo.Database, id string) (user, error)
+}
+
 type UserRepository struct{}
+
+func NewUserRepository() *UserRepository {
+	return &UserRepository{}
+}
 
 func getUC(db *mgo.Database) *mgo.Collection {
 	return db.C("users")
