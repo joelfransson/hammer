@@ -10,6 +10,7 @@ import (
 )
 
 type apiUser struct {
+	ID   string `json:"id"`
 	Name string `json:"name"`
 	Age  int64  `json:"age"`
 }
@@ -20,6 +21,10 @@ type userController struct {
 
 func NewUserController(repo Users) *userController {
 	return &userController{repo}
+}
+
+func NewApiUser(id string, name string, age int64) *apiUser {
+	return &apiUser{id, name, age}
 }
 
 func (uc *userController) addUser(c *gin.Context) {
@@ -35,8 +40,20 @@ func (uc *userController) addUser(c *gin.Context) {
 	}
 
 	uc.repo.insertUser(db, n, age)
+}
 
-	c.JSON(http.StatusOK, "")
+func (uc *userController) updateUser(c *gin.Context) {
+	db := c.MustGet("mongo").(*mgo.Database)
+
+	var a apiUser
+	if err := c.BindJSON(&a); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	u := NewUser(a.ID, a.Name, a.Age)
+
+	uc.repo.updateUser(db, u)
 }
 
 func (uc *userController) getUsers(c *gin.Context) {
@@ -47,9 +64,9 @@ func (uc *userController) getUsers(c *gin.Context) {
 		return
 	}
 
-	data := make([]apiUser, len(res))
+	data := make([]*apiUser, len(res))
 	for i := range data {
-		data[i] = apiUser{res[i].Name, res[i].Age}
+		data[i] = NewApiUser(res[i].ID.Hex(), res[i].Name, res[i].Age)
 	}
 
 	c.JSON(http.StatusOK, data)
@@ -63,7 +80,7 @@ func (uc *userController) getUser(c *gin.Context) {
 		return
 	}
 
-	u := apiUser{res.Name, res.Age}
+	u := NewApiUser(res.ID.Hex(), res.Name, res.Age)
 
 	c.JSON(http.StatusOK, u)
 }

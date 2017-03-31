@@ -28,6 +28,7 @@ func main() {
 	router.GET("/users", uc.getUsers)
 	router.GET("/users/:id", uc.getUser)
 	router.POST("/user", uc.addUser)
+	router.PUT("/user/:id", uc.updateUser)
 
 	router.Run(":3000")
 }
