@@ -23,7 +23,7 @@ func main() {
 	router.Use(errorHandler)
 
 	ur := NewUserRepository()
-	uc := NewUserController(ur)
+	uc := NewUserHandler(ur)
 
 	router.GET("/users", uc.getUsers)
 	router.GET("/users/:id", uc.getUser)
